@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Rittenregister</title>
-<meta name="theme-color" content="#1d4fa0">
+<meta name="theme-color" content="#181818">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,22 +16,21 @@
 /* VOICE: rustig en zakelijk, een logboek dat je in tien seconden invult
    IDEA: het rittenboekje in het handschoenkastje, met een kilometerteller als blikvanger
    PICTURE: de teller met de laatste kilometerstand, daaronder meteen het invulformulier
-   COLOUR and TYPE: verkeersbord-blauw, wit, signaalgeel als accent; systeemletter, tabelcijfers
+   COLOUR and TYPE: huisstijl #181818, #5b5c5c, #c2c2c2, rood #ec1d25 als accent, witte tekst; systeemletter, tabelcijfers
    LAYOUT: één kolom, vaste navigatie onderaan voor de duim */
-:root{color-scheme:light dark;--bg:light-dark(#f4f6fa,#0e1420);--card:light-dark(#fff,#172033);--ink:light-dark(#121826,#e9eef7);--mute:light-dark(#5b6477,#9aa6bd);--line:light-dark(#dde3ee,#27324a);--blue:#1d4fa0;--blue2:light-dark(#1d4fa0,#6f9ce8);--yel:#ffd23f;--red:light-dark(#b42318,#ff8a7a);--ok:light-dark(#18794e,#5fd39a)}
-:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+:root,:root[data-theme=light],:root[data-theme=dark]{color-scheme:dark;--bg:#181818;--card:#222222;--raise:#2b2b2b;--ink:#ffffff;--mute:#c2c2c2;--line:#5b5c5c;--blue:#ec1d25;--blue2:#ec1d25;--yel:#ec1d25;--red:#ff6b70;--ok:#5fd39a}
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .num{font-variant-numeric:tabular-nums;white-space:nowrap}
-header{background:var(--blue);color:#fff;padding:calc(14px + env(safe-area-inset-top)) max(5vw,16px) 22px}
+header{background:var(--bg);border-bottom:1px solid var(--line);color:#fff;padding:calc(14px + env(safe-area-inset-top)) max(5vw,16px) 22px}
 header .top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;max-width:640px;margin:auto}
 header h1{font-size:20px;margin:0;font-weight:700}
 header small{opacity:.8;font-size:13px}
 .odo{max-width:640px;margin:14px auto 0}
 .odo .lbl{font-size:13px;opacity:.85}
 .digits{display:flex;gap:5px;margin-top:6px}
-.digits span{flex:0 0 auto;width:clamp(30px,9vw,42px);height:clamp(42px,12vw,56px);display:grid;place-items:center;background:#0f1a2e;border-radius:6px;font:700 clamp(22px,6.5vw,32px)/1 ui-monospace,"SF Mono",Menlo,monospace;box-shadow:inset 0 -10px 12px rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.12)}
-.digits span.last{background:var(--yel);color:#0f1a2e}
+.digits span{flex:0 0 auto;width:clamp(30px,9vw,42px);height:clamp(42px,12vw,56px);display:grid;place-items:center;background:var(--raise);border:1px solid var(--line);border-radius:6px;font:700 clamp(22px,6.5vw,32px)/1 ui-monospace,"SF Mono",Menlo,monospace;box-shadow:inset 0 -10px 12px rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.12)}
+.digits span.last{background:var(--yel);border-color:var(--yel);color:#fff}
 .digits em{font-style:normal;align-self:end;margin-left:6px;opacity:.85}
 main{max-width:640px;margin:auto;padding:16px max(4vw,12px)}
 section[hidden]{display:none}
@@ -46,10 +45,10 @@ input:focus,button:focus-visible,select:focus{outline:3px solid color-mix(in srg
 .chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 12px;font-size:14px;min-height:38px}
 button{font:inherit;cursor:pointer}
 .btn{min-height:48px;border-radius:12px;border:0;padding:0 18px;font-weight:650;background:var(--blue);color:#fff}
-.btn.sec{background:transparent;color:var(--blue2);border:1px solid var(--line)}
+.btn.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
 .btn.wide{width:100%;margin-top:14px}
 .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.btns .btn{flex:1 1 140px}
-.calc{margin-top:12px;padding:12px;border-radius:10px;background:color-mix(in srgb,var(--blue2) 10%,transparent);display:flex;justify-content:space-between;gap:10px;font-weight:650}
+.calc{margin-top:12px;padding:12px;border-radius:10px;background:var(--raise);display:flex;justify-content:space-between;gap:10px;font-weight:650}
 .calc.bad{background:color-mix(in srgb,var(--red) 12%,transparent);color:var(--red)}
 .warn{color:var(--red);font-size:14px;margin-top:8px}
 .list{list-style:none;margin:0;padding:0}
@@ -59,12 +58,12 @@ button{font:inherit;cursor:pointer}
 .list .r{text-align:right}
 .acts{grid-column:1/-1;display:flex;gap:8px}
 .mini{min-height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:14px}
-.mini.danger{color:var(--red)}.mini.armed{background:var(--red);color:#fff;border-color:var(--red)}
+.mini.danger{color:var(--red)}.mini.armed{background:var(--blue);color:#fff;border-color:var(--blue)}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
 .stat b{display:block;font-size:clamp(18px,5.5vw,24px)}.stat span{font-size:13px;color:var(--mute)}
-.meter{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}.meter i{display:block;height:100%;background:var(--blue2)}
-.meter.hot i{background:var(--red)}
+.meter{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}.meter i{display:block;height:100%;background:var(--mute)}
+.meter.hot i{background:var(--blue)}
 .empty{color:var(--mute);text-align:center;padding:18px 0}
 .rate{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:8px;align-items:center;margin-top:8px}
 .note{font-size:14px;color:var(--mute)}
@@ -72,8 +71,8 @@ nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px
 nav button{border:0;background:none;color:var(--mute);min-height:62px;font-size:13px;display:grid;place-items:center;gap:2px;padding:6px 0}
 nav button svg{width:24px;height:24px}
 nav button[aria-current=true]{color:var(--blue2);font-weight:700}
-#toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#121826;color:#fff;border-radius:12px;padding:10px 12px 10px 16px;display:flex;gap:12px;align-items:center;width:max-content;max-width:calc(100vw - 24px);box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:9}
-#toast[hidden]{display:none}#toast button{white-space:nowrap;flex:none;background:var(--yel);color:#121826;border:0;border-radius:8px;min-height:38px;padding:0 12px;font-weight:700}
+#toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--raise);border:1px solid var(--line);color:#fff;border-radius:12px;padding:10px 12px 10px 16px;display:flex;gap:12px;align-items:center;width:max-content;max-width:calc(100vw - 24px);box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:9}
+#toast[hidden]{display:none}#toast button{white-space:nowrap;flex:none;background:var(--yel);color:#fff;border:0;border-radius:8px;min-height:38px;padding:0 12px;font-weight:700}
 @media (prefers-reduced-motion:no-preference){.digits span.last{transition:transform .3s}.bump .digits span.last{transform:translateY(-3px)}}
 </style>
 </head>
@@ -126,7 +125,7 @@ nav button[aria-current=true]{color:var(--blue2);font-weight:700}
   </div>
   <div class="warn" id="rateWarn" hidden></div>
   <div class="btns">
-    <button class="btn" id="pdfBtn">PDF-onkostennota</button>
+    <button class="btn" id="pdfBtn">PDF-nota</button>
     <button class="btn sec" id="csvBtn">CSV-export</button>
   </div>
   <h2>Ritten deze maand</h2>
@@ -386,7 +385,7 @@ $('#pdfBtn').addEventListener('click', () => {
   const m = $('#month').value || today().slice(0, 7), ts = monthTrips(m), st = S.settings;
   const doc = new window.jspdf.jsPDF({unit:'mm', format:'a4'});
   const W = doc.internal.pageSize.getWidth();
-  doc.setFillColor(29, 79, 160); doc.rect(0, 0, W, 26, 'F');
+  doc.setFillColor(24, 24, 24); doc.rect(0, 0, W, 26, 'F'); doc.setFillColor(236, 29, 37); doc.rect(0, 26, W, 1.2, 'F');
   doc.setTextColor(255); doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
   doc.text('Onkostennota kilometervergoeding', 14, 12);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.text('Periode: ' + monthName(m), 14, 19);
@@ -402,7 +401,7 @@ $('#pdfBtn').addEventListener('click', () => {
     body: ts.map(t => { const r = rateFor(t.date); return [fmtDate(t.date), t.from, t.to, t.purpose, fmtKm(t.kmStart) + ' – ' + fmtKm(t.kmEnd), fmtKm(kmOf(t)), r == null ? '–' : n2(r, 4), 'EUR ' + n2(amountOf(t), 2)]; }),
     foot: [['Totaal', '', '', '', '', fmtKm(totKm), '', 'EUR ' + n2(tot, 2)]],
     styles: {fontSize:8, cellPadding:1.8, overflow:'linebreak', textColor:20},
-    headStyles: {fillColor:[29,79,160], textColor:255}, footStyles: {fillColor:[235,240,248], textColor:20, fontStyle:'bold'},
+    headStyles: {fillColor:[24,24,24], textColor:255}, footStyles: {fillColor:[232,232,232], textColor:20, fontStyle:'bold'},
     columnStyles: {0:{cellWidth:18}, 4:{cellWidth:26}, 5:{halign:'right', cellWidth:12}, 6:{halign:'right', cellWidth:14}, 7:{halign:'right', cellWidth:22}},
     didParseCell: d => { if ((d.section === 'head' || d.section === 'foot') && d.column.index >= 5) d.cell.styles.halign = 'right'; },
     margin: {left:14, right:14}
