@@ -22,7 +22,7 @@
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .num{font-variant-numeric:tabular-nums;white-space:nowrap}
-header{background:var(--bg);border-bottom:1px solid var(--line);color:#fff;padding:calc(10px + env(safe-area-inset-top)) max(5vw,16px) 14px}
+header{background:var(--bg);border-bottom:1px solid var(--line);color:#fff;padding:calc(22px + env(safe-area-inset-top)) max(5vw,16px) 14px}
 header .top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;max-width:640px;margin:auto}
 header h1{font-size:20px;margin:0;font-weight:700}
 header small{opacity:.8;font-size:13px}
@@ -39,6 +39,8 @@ h2{font-size:20px;margin:22px 0 10px}
 label{display:block;font-size:14px;color:var(--mute);margin:9px 0 3px}
 label:first-child{margin-top:0}
 input,select,textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px}
+input[type=date],input[type=month]{-webkit-appearance:none;appearance:none;display:block;min-width:0;max-width:100%;text-align:left}
+input::-webkit-date-and-time-value{text-align:left}
 input:focus,button:focus-visible,select:focus{outline:3px solid color-mix(in srgb,var(--blue2) 45%,transparent);outline-offset:1px;border-color:var(--blue2)}
 .datebox{position:relative}.datebox .shown{display:flex;align-items:center;width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden}
 .datebox input{position:absolute;inset:0;width:100%;height:100%;opacity:0;-webkit-appearance:none;appearance:none;min-width:0;cursor:pointer}
@@ -68,7 +70,7 @@ button{font:inherit;cursor:pointer}
 .meter{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}.meter i{display:block;height:100%;background:var(--mute)}
 .meter.hot i{background:var(--blue)}
 .empty{color:var(--mute);text-align:center;padding:18px 0}
-.rate{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:8px;align-items:center;margin-top:8px}
+.rate{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:center;margin-top:12px}.rate .mini{grid-column:1/-1;min-height:44px}
 .note{font-size:14px;color:var(--mute)}
 nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding-bottom:env(safe-area-inset-bottom);z-index:5}
 nav button{border:0;background:none;color:var(--mute);min-height:62px;font-size:13px;display:grid;place-items:center;gap:2px;padding:6px 0}
@@ -155,7 +157,7 @@ nav button[aria-current=true]{color:var(--blue2);font-weight:700}
     <div class="rate">
       <input type="date" id="newRateFrom" aria-label="Geldig vanaf">
       <input id="newRate" inputmode="decimal" placeholder="0,4452" aria-label="Euro per km">
-      <button class="mini" id="addRate" type="button">Toevoegen</button>
+      <button class="mini" id="addRate" type="button">Tarief toevoegen</button>
     </div>
   </div>
 
