@@ -22,24 +22,27 @@
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .num{font-variant-numeric:tabular-nums;white-space:nowrap}
-header{background:var(--bg);border-bottom:1px solid var(--line);color:#fff;padding:calc(14px + env(safe-area-inset-top)) max(5vw,16px) 22px}
+header{background:var(--bg);border-bottom:1px solid var(--line);color:#fff;padding:calc(10px + env(safe-area-inset-top)) max(5vw,16px) 14px}
 header .top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;max-width:640px;margin:auto}
 header h1{font-size:20px;margin:0;font-weight:700}
 header small{opacity:.8;font-size:13px}
-.odo{max-width:640px;margin:14px auto 0}
+.odo{max-width:640px;margin:8px auto 0}
 .odo .lbl{font-size:13px;opacity:.85}
 .digits{display:flex;gap:5px;margin-top:6px}
-.digits span{flex:0 0 auto;width:clamp(30px,9vw,42px);height:clamp(42px,12vw,56px);display:grid;place-items:center;background:var(--raise);border:1px solid var(--line);border-radius:6px;font:700 clamp(22px,6.5vw,32px)/1 ui-monospace,"SF Mono",Menlo,monospace;box-shadow:inset 0 -10px 12px rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.12)}
+.digits span{flex:0 0 auto;width:clamp(30px,9vw,42px);height:clamp(40px,11vw,50px);display:grid;place-items:center;background:var(--raise);border:1px solid var(--line);border-radius:6px;font:700 clamp(22px,6.5vw,32px)/1 ui-monospace,"SF Mono",Menlo,monospace;box-shadow:inset 0 -10px 12px rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.12)}
 .digits span.last{background:var(--yel);border-color:var(--yel);color:#fff}
 .digits em{font-style:normal;align-self:end;margin-left:6px;opacity:.85}
-main{max-width:640px;margin:auto;padding:16px max(4vw,12px)}
+main{max-width:640px;margin:auto;padding:12px max(4vw,12px)}
 section[hidden]{display:none}
 h2{font-size:20px;margin:22px 0 10px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
-label{display:block;font-size:14px;color:var(--mute);margin:12px 0 4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+label{display:block;font-size:14px;color:var(--mute);margin:9px 0 3px}
 label:first-child{margin-top:0}
-input,select,textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;min-height:46px}
+input,select,textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px}
 input:focus,button:focus-visible,select:focus{outline:3px solid color-mix(in srgb,var(--blue2) 45%,transparent);outline-offset:1px;border-color:var(--blue2)}
+.datebox{position:relative}.datebox .shown{display:flex;align-items:center;width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden}
+.datebox input{position:absolute;inset:0;width:100%;height:100%;opacity:0;-webkit-appearance:none;appearance:none;min-width:0;cursor:pointer}
+.datebox:focus-within .shown{outline:3px solid color-mix(in srgb,var(--blue2) 45%,transparent);outline-offset:1px;border-color:var(--blue2)}
 .row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 12px;font-size:14px;min-height:38px}
@@ -47,8 +50,8 @@ button{font:inherit;cursor:pointer}
 .btn{min-height:48px;border-radius:12px;border:0;padding:0 18px;font-weight:650;background:var(--blue);color:#fff}
 .btn.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
 .btn.wide{width:100%;margin-top:14px}
-.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.btns .btn{flex:1 1 140px}
-.calc{margin-top:12px;padding:12px;border-radius:10px;background:var(--raise);display:flex;justify-content:space-between;gap:10px;font-weight:650}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.btns .btn{flex:1 1 140px}
+.calc{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--raise);display:flex;justify-content:space-between;gap:10px;font-weight:650}
 .calc.bad{background:color-mix(in srgb,var(--red) 12%,transparent);color:var(--red)}
 .warn{color:var(--red);font-size:14px;margin-top:8px}
 .list{list-style:none;margin:0;padding:0}
@@ -86,7 +89,7 @@ nav button[aria-current=true]{color:var(--blue2);font-weight:700}
 <section id="v-rit">
   <form class="card" id="tripForm" novalidate>
     <div class="row">
-      <div><label for="fDate">Datum</label><input type="date" id="fDate" required></div>
+      <div><label for="fDate">Datum</label><div class="datebox"><span class="shown" id="fDateShown" aria-hidden="true"></span><input type="date" id="fDate" required></div></div>
       <div><label for="fPurpose">Doel / klant</label><input id="fPurpose" placeholder="bv. Overleg Janssens" autocomplete="off" required></div>
     </div>
     <label for="fFrom">Van</label><input id="fFrom" list="placeList" autocomplete="off">
@@ -264,6 +267,7 @@ function resetForm(prefill){
 }
 function overlaps(t){ return S.trips.find(o => o.id !== t.id && t.kmStart < o.kmEnd && t.kmEnd > o.kmStart); }
 function updateCalc(){
+  $('#fDateShown').textContent = F.date.value ? (([y, m, d]) => `${+d} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m - 1]} ${y}`)(F.date.value.split('-')) : 'Kies datum';
   const a = parseNum(F.start.value), b = parseNum(F.end.value), c = $('#calc');
   c.classList.remove('bad');
   if (isNaN(a) || isNaN(b)) { c.innerHTML = '<span>Vul de kilometerstanden in</span><span></span>'; return; }
