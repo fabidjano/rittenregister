@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="nl-BE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Rittenregister</title>
+<meta name="theme-color" content="#1d4fa0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ritten">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+/* VOICE: rustig en zakelijk, een logboek dat je in tien seconden invult
+   IDEA: het rittenboekje in het handschoenkastje, met een kilometerteller als blikvanger
+   PICTURE: de teller met de laatste kilometerstand, daaronder meteen het invulformulier
+   COLOUR and TYPE: verkeersbord-blauw, wit, signaalgeel als accent; systeemletter, tabelcijfers
+   LAYOUT: één kolom, vaste navigatie onderaan voor de duim */
+:root{color-scheme:light dark;--bg:light-dark(#f4f6fa,#0e1420);--card:light-dark(#fff,#172033);--ink:light-dark(#121826,#e9eef7);--mute:light-dark(#5b6477,#9aa6bd);--line:light-dark(#dde3ee,#27324a);--blue:#1d4fa0;--blue2:light-dark(#1d4fa0,#6f9ce8);--yel:#ffd23f;--red:light-dark(#b42318,#ff8a7a);--ok:light-dark(#18794e,#5fd39a)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+header{background:var(--blue);color:#fff;padding:calc(14px + env(safe-area-inset-top)) max(5vw,16px) 22px}
+header .top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;max-width:640px;margin:auto}
+header h1{font-size:20px;margin:0;font-weight:700}
+header small{opacity:.8;font-size:13px}
+.odo{max-width:640px;margin:14px auto 0}
+.odo .lbl{font-size:13px;opacity:.85}
+.digits{display:flex;gap:5px;margin-top:6px}
+.digits span{flex:0 0 auto;width:clamp(30px,9vw,42px);height:clamp(42px,12vw,56px);display:grid;place-items:center;background:#0f1a2e;border-radius:6px;font:700 clamp(22px,6.5vw,32px)/1 ui-monospace,"SF Mono",Menlo,monospace;box-shadow:inset 0 -10px 12px rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.12)}
+.digits span.last{background:var(--yel);color:#0f1a2e}
+.digits em{font-style:normal;align-self:end;margin-left:6px;opacity:.85}
+main{max-width:640px;margin:auto;padding:16px max(4vw,12px)}
+section[hidden]{display:none}
+h2{font-size:20px;margin:22px 0 10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+label{display:block;font-size:14px;color:var(--mute);margin:12px 0 4px}
+label:first-child{margin-top:0}
+input,select,textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;min-height:46px}
+input:focus,button:focus-visible,select:focus{outline:3px solid color-mix(in srgb,var(--blue2) 45%,transparent);outline-offset:1px;border-color:var(--blue2)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 12px;font-size:14px;min-height:38px}
+button{font:inherit;cursor:pointer}
+.btn{min-height:48px;border-radius:12px;border:0;padding:0 18px;font-weight:650;background:var(--blue);color:#fff}
+.btn.sec{background:transparent;color:var(--blue2);border:1px solid var(--line)}
+.btn.wide{width:100%;margin-top:14px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.btns .btn{flex:1 1 140px}
+.calc{margin-top:12px;padding:12px;border-radius:10px;background:color-mix(in srgb,var(--blue2) 10%,transparent);display:flex;justify-content:space-between;gap:10px;font-weight:650}
+.calc.bad{background:color-mix(in srgb,var(--red) 12%,transparent);color:var(--red)}
+.warn{color:var(--red);font-size:14px;margin-top:8px}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:12px 0;border-top:1px solid var(--line)}
+.list li:first-child{border-top:0}
+.list .t{font-weight:600;overflow-wrap:anywhere}.list .s{font-size:14px;color:var(--mute);overflow-wrap:anywhere}
+.list .r{text-align:right}
+.acts{grid-column:1/-1;display:flex;gap:8px}
+.mini{min-height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:14px}
+.mini.danger{color:var(--red)}.mini.armed{background:var(--red);color:#fff;border-color:var(--red)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat b{display:block;font-size:clamp(18px,5.5vw,24px)}.stat span{font-size:13px;color:var(--mute)}
+.meter{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}.meter i{display:block;height:100%;background:var(--blue2)}
+.meter.hot i{background:var(--red)}
+.empty{color:var(--mute);text-align:center;padding:18px 0}
+.rate{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:8px;align-items:center;margin-top:8px}
+.note{font-size:14px;color:var(--mute)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding-bottom:env(safe-area-inset-bottom);z-index:5}
+nav button{border:0;background:none;color:var(--mute);min-height:62px;font-size:13px;display:grid;place-items:center;gap:2px;padding:6px 0}
+nav button svg{width:24px;height:24px}
+nav button[aria-current=true]{color:var(--blue2);font-weight:700}
+#toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#121826;color:#fff;border-radius:12px;padding:10px 12px 10px 16px;display:flex;gap:12px;align-items:center;width:max-content;max-width:calc(100vw - 24px);box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:9}
+#toast[hidden]{display:none}#toast button{white-space:nowrap;flex:none;background:var(--yel);color:#121826;border:0;border-radius:8px;min-height:38px;padding:0 12px;font-weight:700}
+@media (prefers-reduced-motion:no-preference){.digits span.last{transition:transform .3s}.bump .digits span.last{transform:translateY(-3px)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="top"><h1>Rittenregister</h1><small id="hdrSub"></small></div>
+  <div class="odo"><div class="lbl">Laatste kilometerstand</div><div class="digits" id="odo" aria-live="polite"></div></div>
+</header>
+
+<main>
+<section id="v-rit">
+  <form class="card" id="tripForm" novalidate>
+    <div class="row">
+      <div><label for="fDate">Datum</label><input type="date" id="fDate" required></div>
+      <div><label for="fPurpose">Doel / klant</label><input id="fPurpose" placeholder="bv. Overleg Janssens" autocomplete="off" required></div>
+    </div>
+    <label for="fFrom">Van</label><input id="fFrom" list="placeList" autocomplete="off">
+    <label for="fTo">Naar</label><input id="fTo" list="placeList" autocomplete="off" required>
+    <div class="chips" id="placeChips"></div>
+    <div class="row">
+      <div><label for="fStart">Km-stand vertrek</label><input id="fStart" inputmode="numeric" pattern="[0-9]*" required></div>
+      <div><label for="fEnd">Km-stand aankomst</label><input id="fEnd" inputmode="numeric" pattern="[0-9]*" required></div>
+    </div>
+    <div class="calc" id="calc"><span>Vul de kilometerstanden in</span><span></span></div>
+    <div class="warn" id="formWarn" hidden></div>
+    <div class="btns">
+      <button class="btn" type="submit" id="saveBtn">Rit opslaan</button>
+      <button class="btn sec" type="button" id="cancelEdit" hidden>Annuleren</button>
+    </div>
+  </form>
+  <datalist id="placeList"></datalist>
+  <h2>Recente ritten</h2>
+  <div class="card"><ul class="list" id="recent"></ul></div>
+</section>
+
+<section id="v-overzicht" hidden>
+  <div class="card">
+    <label for="month">Maand</label>
+    <input type="month" id="month">
+  </div>
+  <div class="stats">
+    <div class="stat"><b class="num" id="sTrips">0</b><span>ritten</span></div>
+    <div class="stat"><b class="num" id="sKm">0</b><span>km</span></div>
+    <div class="stat"><b class="num" id="sEur">€ 0</b><span>te vergoeden</span></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div style="display:flex;justify-content:space-between;gap:8px"><span id="yearLbl">Dit jaar</span><span class="num" id="yearKm"></span></div>
+    <div class="meter" id="meter"><i></i></div>
+    <div class="note" style="margin-top:6px">Het forfait geldt tot 24.000 beroepskilometers per jaar.</div>
+  </div>
+  <div class="warn" id="rateWarn" hidden></div>
+  <div class="btns">
+    <button class="btn" id="pdfBtn">PDF-onkostennota</button>
+    <button class="btn sec" id="csvBtn">CSV-export</button>
+  </div>
+  <h2>Ritten deze maand</h2>
+  <div class="card"><ul class="list" id="monthList"></ul></div>
+</section>
+
+<section id="v-instellingen" hidden>
+  <h2 style="margin-top:4px">Gegevens op de onkostennota</h2>
+  <div class="card">
+    <label for="sName">Naam bedrijfsleider</label><input id="sName" autocomplete="name">
+    <label for="sCompany">Vennootschap</label><input id="sCompany" autocomplete="organization">
+    <label for="sVat">Ondernemingsnummer</label><input id="sVat" placeholder="BE 0123.456.789">
+    <div class="row">
+      <div><label for="sPlate">Nummerplaat</label><input id="sPlate" autocapitalize="characters"></div>
+      <div><label for="sCar">Wagen</label><input id="sCar" placeholder="merk en model"></div>
+    </div>
+    <label for="sHome">Vertrekadres (thuis / zetel)</label><input id="sHome" autocomplete="street-address">
+  </div>
+
+  <h2>Kilometertarief</h2>
+  <div class="card">
+    <p class="note" style="margin-top:0">Elke rit krijgt het tarief dat gold op de datum van de rit. Voeg een nieuwe regel toe zodra de overheid een nieuw kwartaal- of maandbedrag publiceert.</p>
+    <div id="rates"></div>
+    <div class="rate">
+      <input type="date" id="newRateFrom" aria-label="Geldig vanaf">
+      <input id="newRate" inputmode="decimal" placeholder="0,4452" aria-label="Euro per km">
+      <button class="mini" id="addRate" type="button">Toevoegen</button>
+    </div>
+  </div>
+
+  <h2>Vaste bestemmingen</h2>
+  <div class="card">
+    <ul class="list" id="places"></ul>
+    <div class="row" style="margin-top:8px">
+      <input id="newPlace" placeholder="Naam (bv. Klant Janssens)">
+      <input id="newPlaceAddr" placeholder="Adres">
+    </div>
+    <button class="btn sec wide" id="addPlace" type="button">Bestemming toevoegen</button>
+  </div>
+
+  <h2>Back-up</h2>
+  <div class="card">
+    <p class="note" style="margin-top:0">Je ritten staan alleen op deze gsm. Maak geregeld een back-up, bijvoorbeeld samen met je maandelijkse onkostennota.</p>
+    <div class="btns" style="margin-top:8px">
+      <button class="btn sec" id="backupBtn" type="button">Back-up maken</button>
+      <button class="btn sec" id="restoreBtn" type="button">Back-up terugzetten</button>
+    </div>
+    <input type="file" id="restoreFile" accept="application/json,.json" hidden>
+    <p class="note" id="storeInfo"></p>
+  </div>
+</section>
+</main>
+
+<nav>
+  <button data-v="rit" aria-current="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nieuwe rit</button>
+  <button data-v="overzicht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Overzicht</button>
+  <button data-v="instellingen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Instellingen</button>
+</nav>
+
+<div id="toast" role="status" hidden><span id="toastMsg"></span><button id="toastBtn" hidden></button></div>
+
+<script src="jspdf.umd.min.js" defer></script>
+<script src="jspdf.plugin.autotable.min.js" defer></script>
+<script>
+{
+const KEY = 'rittenregister.v1';
+// Officiële forfaitaire kilometervergoeding (kwartaal- en tijdelijk maandbedragen) 2026.
+const DEFAULT_RATES = [
+  {from:'2026-01-01', rate:0.4326}, {from:'2026-04-01', rate:0.4571}, {from:'2026-05-01', rate:0.4841},
+  {from:'2026-06-01', rate:0.5055}, {from:'2026-07-01', rate:0.4440}, {from:'2026-10-01', rate:0.4452}
+];
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
+const fmtKm = n => Number(n).toLocaleString('nl-BE');
+const eur = n => n.toLocaleString('nl-BE', {style:'currency', currency:'EUR'});
+const rateTxt = r => '€ ' + r.toLocaleString('nl-BE', {minimumFractionDigits:4, maximumFractionDigits:4});
+const fmtDate = d => d.split('-').reverse().join('/');
+const parseNum = v => { const s = String(v).trim().replace(/\s|\./g, '').replace(',', '.'); return s === '' ? NaN : Number(s); };
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+function defaults(){ return {settings:{name:'',company:'',vat:'',plate:'',car:'',home:''}, rates:DEFAULT_RATES.slice(), places:[], trips:[]}; }
+function load(){
+  try { const j = JSON.parse(localStorage.getItem(KEY)); if (j && Array.isArray(j.trips)) return Object.assign(defaults(), j); } catch(e) {}
+  return defaults();
+}
+let S = load();
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify(S)); return true; }
+  catch(e){ toast('Opslaan op dit toestel lukt niet. Maak meteen een back-up.'); return false; }
+}
+
+const sortTrips = a => a.slice().sort((x, y) => x.date.localeCompare(y.date) || x.kmStart - y.kmStart);
+const rateFor = date => { let r = null; for (const x of S.rates.slice().sort((a,b) => a.from.localeCompare(b.from))) if (x.from <= date) r = x.rate; return r; };
+const kmOf = t => t.kmEnd - t.kmStart;
+const amountOf = t => { const r = rateFor(t.date); return r == null ? 0 : Math.round(kmOf(t) * r * 100) / 100; };
+const lastOdo = () => S.trips.reduce((m, t) => Math.max(m, t.kmEnd), 0);
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(msg, btnText, onBtn){
+  $('#toastMsg').textContent = msg;
+  const b = $('#toastBtn'); b.hidden = !btnText; b.textContent = btnText || ''; b.onclick = () => { $('#toast').hidden = true; onBtn && onBtn(); };
+  $('#toast').hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => $('#toast').hidden = true, btnText ? 7000 : 3500);
+}
+
+/* ---------- navigatie ---------- */
+function show(v){
+  for (const s of document.querySelectorAll('main section')) s.hidden = s.id !== 'v-' + v;
+  for (const b of document.querySelectorAll('nav button')) b.setAttribute('aria-current', b.dataset.v === v);
+  if (v === 'overzicht') renderMonth();
+  if (v === 'instellingen') renderSettings();
+  scrollTo(0, 0);
+}
+document.querySelectorAll('nav button').forEach(b => b.addEventListener('click', () => show(b.dataset.v)));
+
+/* ---------- header ---------- */
+function renderOdo(){
+  const v = lastOdo(); const s = String(v).padStart(6, '0');
+  $('#odo').innerHTML = [...s].map((c, i) => `<span class="${i === s.length - 1 ? 'last' : ''}">${c}</span>`).join('') + '<em>km</em>';
+  const r = rateFor(today());
+  $('#hdrSub').textContent = r == null ? 'geen tarief ingesteld' : rateTxt(r) + '/km';
+}
+
+/* ---------- formulier ---------- */
+let editing = null;
+const F = {date:$('#fDate'), purpose:$('#fPurpose'), from:$('#fFrom'), to:$('#fTo'), start:$('#fStart'), end:$('#fEnd')};
+function resetForm(prefill){
+  editing = null; $('#saveBtn').textContent = 'Rit opslaan'; $('#cancelEdit').hidden = true; $('#formWarn').hidden = true;
+  const last = sortTrips(S.trips).pop();
+  F.date.value = today(); F.purpose.value = ''; F.to.value = '';
+  F.from.value = last ? last.to : (S.settings.home || '');
+  F.start.value = last ? last.kmEnd : ''; F.end.value = '';
+  if (prefill) for (const k in prefill) F[k].value = prefill[k];
+  updateCalc();
+}
+function overlaps(t){ return S.trips.find(o => o.id !== t.id && t.kmStart < o.kmEnd && t.kmEnd > o.kmStart); }
+function updateCalc(){
+  const a = parseNum(F.start.value), b = parseNum(F.end.value), c = $('#calc');
+  c.classList.remove('bad');
+  if (isNaN(a) || isNaN(b)) { c.innerHTML = '<span>Vul de kilometerstanden in</span><span></span>'; return; }
+  const km = b - a;
+  if (km <= 0) { c.classList.add('bad'); c.innerHTML = '<span>Aankomst moet hoger zijn dan vertrek</span><span></span>'; return; }
+  const r = rateFor(F.date.value || today());
+  c.innerHTML = `<span class="num">${fmtKm(km)} km</span><span class="num">${r == null ? 'geen tarief' : eur(Math.round(km * r * 100) / 100)}</span>`;
+}
+['input','change'].forEach(ev => [F.start, F.end, F.date].forEach(i => i.addEventListener(ev, updateCalc)));
+
+$('#tripForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const t = {id: editing || uid(), date:F.date.value, purpose:F.purpose.value.trim(), from:F.from.value.trim() || S.settings.home || '', to:F.to.value.trim(), kmStart:parseNum(F.start.value), kmEnd:parseNum(F.end.value)};
+  const w = $('#formWarn'); const err = m => { w.textContent = m; w.hidden = false; };
+  if (!t.date) return err('Kies een datum.');
+  if (!t.to) return err('Vul de bestemming in.');
+  if (!t.purpose) return err('Vul het doel of de klant in: dat is je bewijs dat de rit beroepsmatig is.');
+  if (!Number.isInteger(t.kmStart) || !Number.isInteger(t.kmEnd) || t.kmStart < 0) return err('Vul beide kilometerstanden in als hele getallen.');
+  if (t.kmEnd <= t.kmStart) return err('De km-stand bij aankomst moet hoger zijn dan bij vertrek.');
+  const o = overlaps(t);
+  if (o && w.dataset.ack !== t.kmStart + '-' + t.kmEnd) { w.dataset.ack = t.kmStart + '-' + t.kmEnd; return err(`Let op: deze kilometers overlappen met de rit van ${fmtDate(o.date)} naar ${o.to}. Tik nogmaals op opslaan als het toch klopt.`); }
+  w.hidden = true; delete w.dataset.ack;
+  const i = S.trips.findIndex(x => x.id === t.id);
+  if (i >= 0) S.trips[i] = t; else S.trips.push(t);
+  save(); const wasEdit = !!editing; renderAll();
+  document.body.classList.add('bump'); setTimeout(() => document.body.classList.remove('bump'), 350);
+  resetForm();
+  if (wasEdit) { toast('Rit bijgewerkt'); show('overzicht'); }
+  else toast(`Rit opgeslagen: ${fmtKm(kmOf(t))} km`, 'Terugrit', () => resetForm({date:t.date, purpose:t.purpose, from:t.to, to:t.from, start:t.kmEnd}));
+});
+$('#cancelEdit').addEventListener('click', () => { resetForm(); show('overzicht'); });
+
+function editTrip(id){
+  const t = S.trips.find(x => x.id === id); if (!t) return;
+  show('rit'); resetForm({date:t.date, purpose:t.purpose, from:t.from, to:t.to, start:t.kmStart, end:t.kmEnd});
+  editing = id; $('#saveBtn').textContent = 'Wijziging opslaan'; $('#cancelEdit').hidden = false;
+}
+
+/* bevestigen met een tweede tik */
+function armed(btn, fn){
+  if (btn.classList.contains('armed')) return fn();
+  btn.classList.add('armed'); const old = btn.textContent; btn.textContent = 'Zeker?';
+  setTimeout(() => { btn.classList.remove('armed'); btn.textContent = old; }, 3000);
+}
+function deleteTrip(id){
+  const i = S.trips.findIndex(x => x.id === id); if (i < 0) return;
+  const [gone] = S.trips.splice(i, 1); save(); renderAll();
+  toast('Rit gewist', 'Ongedaan maken', () => { S.trips.push(gone); save(); renderAll(); });
+}
+
+function tripLi(t, actions){
+  const r = rateFor(t.date);
+  return `<li><div><div class="t">${esc(t.to)}</div><div class="s">${fmtDate(t.date)} · ${esc(t.purpose)}${t.from ? ' · van ' + esc(t.from) : ''}</div><div class="s num">${fmtKm(t.kmStart)} – ${fmtKm(t.kmEnd)}</div></div>
+  <div class="r"><div class="t num">${fmtKm(kmOf(t))} km</div><div class="s num">${r == null ? 'geen tarief' : eur(amountOf(t))}</div></div>
+  ${actions ? `<div class="acts"><button class="mini" data-edit="${esc(t.id)}">Wijzigen</button><button class="mini danger" data-del="${esc(t.id)}">Wissen</button></div>` : ''}</li>`;
+}
+function bindActs(root){
+  root.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => editTrip(b.dataset.edit));
+  root.querySelectorAll('[data-del]').forEach(b => b.onclick = () => armed(b, () => deleteTrip(b.dataset.del)));
+}
+function renderRecent(){
+  const list = sortTrips(S.trips).reverse().slice(0, 6);
+  $('#recent').innerHTML = list.length ? list.map(t => tripLi(t, true)).join('') : '<li class="empty" style="display:block">Nog geen ritten. Je eerste rit verschijnt hier.</li>';
+  bindActs($('#recent'));
+}
+function renderPlaces(){
+  $('#placeList').innerHTML = S.places.map(p => `<option value="${esc(p.name)}">${esc(p.addr)}</option>`).join('') + (S.settings.home ? `<option value="${esc(S.settings.home)}">Thuis</option>` : '');
+  const chips = (S.settings.home ? [{name:'Thuis', val:S.settings.home}] : []).concat(S.places.map(p => ({name:p.name, val:p.name})));
+  $('#placeChips').innerHTML = chips.map((c, i) => `<button type="button" class="chip" data-i="${i}">${esc(c.name)}</button>`).join('');
+  $('#placeChips').querySelectorAll('.chip').forEach(b => b.onclick = () => { F.to.value = chips[b.dataset.i].val; F.purpose.focus(); });
+}
+
+/* ---------- overzicht ---------- */
+const monthTrips = m => sortTrips(S.trips.filter(t => t.date.startsWith(m)));
+function renderMonth(){
+  const m = $('#month').value || today().slice(0, 7);
+  const ts = monthTrips(m);
+  const km = ts.reduce((s, t) => s + kmOf(t), 0), sum = ts.reduce((s, t) => s + amountOf(t), 0);
+  $('#sTrips').textContent = ts.length; $('#sKm').textContent = fmtKm(km); $('#sEur').textContent = eur(sum);
+  const y = m.slice(0, 4), ykm = S.trips.filter(t => t.date.startsWith(y)).reduce((s, t) => s + kmOf(t), 0);
+  $('#yearLbl').textContent = 'Beroepskilometers ' + y; $('#yearKm').textContent = fmtKm(ykm) + ' / 24.000 km';
+  $('#meter i').style.width = Math.min(100, ykm / 240) + '%'; $('#meter').classList.toggle('hot', ykm > 22000);
+  const noRate = ts.filter(t => rateFor(t.date) == null);
+  $('#rateWarn').hidden = !noRate.length;
+  $('#rateWarn').textContent = noRate.length ? `${noRate.length} rit(ten) hebben geen tarief: voeg bij Instellingen een tarief toe dat geldt vanaf ${fmtDate(noRate[0].date)} of eerder.` : '';
+  $('#monthList').innerHTML = ts.length ? ts.map(t => tripLi(t, true)).join('') : '<li class="empty" style="display:block">Geen ritten in deze maand.</li>';
+  bindActs($('#monthList'));
+  $('#pdfBtn').disabled = $('#csvBtn').disabled = !ts.length;
+}
+$('#month').addEventListener('change', renderMonth);
+const monthName = m => new Date(m + '-01T12:00').toLocaleDateString('nl-BE', {month:'long', year:'numeric'});
+
+/* ---------- bestanden bewaren ---------- */
+const dlP = window.claude && window.claude.use ? window.claude.use('downloads').catch(() => null) : Promise.resolve(null);
+async function saveFile(name, blob){
+  const dl = await dlP;
+  if (dl) { try { await dl.save({filename:name, data:blob}); toast('Bewaard: ' + name); } catch(e){ if (e && e.code !== 'declined') toast('Bewaren lukte niet hier.'); } return; }
+  const file = new File([blob], name, {type:blob.type});
+  if (matchMedia('(pointer:coarse)').matches && navigator.canShare && navigator.canShare({files:[file]})) {
+    try { await navigator.share({files:[file], title:name}); return; } catch(e){ if (e.name === 'AbortError') return; }
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+}
+
+$('#csvBtn').addEventListener('click', () => {
+  const m = $('#month').value || today().slice(0, 7), ts = monthTrips(m);
+  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const dec = (n, d) => n.toFixed(d).replace('.', ',');
+  const rows = [['Datum','Van','Naar','Doel','Km-stand vertrek','Km-stand aankomst','Km','Tarief (EUR/km)','Bedrag (EUR)']]
+    .concat(ts.map(t => { const r = rateFor(t.date); return [fmtDate(t.date), t.from, t.to, t.purpose, t.kmStart, t.kmEnd, kmOf(t), r == null ? '' : dec(r, 4), dec(amountOf(t), 2)]; }))
+    .concat([['Totaal','','','','','', ts.reduce((s,t) => s + kmOf(t), 0), '', dec(ts.reduce((s,t) => s + amountOf(t), 0), 2)]]);
+  const csv = '﻿' + rows.map(r => r.map(q).join(';')).join('\r\n');
+  saveFile(`ritten-${m}.csv`, new Blob([csv], {type:'text/csv'}));
+});
+
+$('#pdfBtn').addEventListener('click', () => {
+  if (!window.jspdf || !window.jspdf.jsPDF) return toast('De PDF-module is nog niet geladen. Probeer zo opnieuw.');
+  const m = $('#month').value || today().slice(0, 7), ts = monthTrips(m), st = S.settings;
+  const doc = new window.jspdf.jsPDF({unit:'mm', format:'a4'});
+  const W = doc.internal.pageSize.getWidth();
+  doc.setFillColor(29, 79, 160); doc.rect(0, 0, W, 26, 'F');
+  doc.setTextColor(255); doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+  doc.text('Onkostennota kilometervergoeding', 14, 12);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.text('Periode: ' + monthName(m), 14, 19);
+  doc.setTextColor(20);
+  const meta = [['Begunstigde', st.name], ['Vennootschap', st.company], ['Ondernemingsnr.', st.vat], ['Wagen', [st.car, st.plate].filter(Boolean).join(' – ')], ['Vertrekadres', st.home]].filter(r => r[1]);
+  let y = 34; doc.setFontSize(10);
+  for (const [k, v] of meta) { doc.setTextColor(100); doc.text(k, 14, y); doc.setTextColor(20); doc.text(String(v), 50, y); y += 5.5; }
+  const n2 = (n, d) => n.toLocaleString('nl-BE', {minimumFractionDigits:d, maximumFractionDigits:d});
+  const totKm = ts.reduce((s,t) => s + kmOf(t), 0), tot = ts.reduce((s,t) => s + amountOf(t), 0);
+  doc.autoTable({
+    startY: y + 3,
+    head: [['Datum', 'Van', 'Naar', 'Doel', 'Km-stand', 'Km', 'Tarief', 'Bedrag']],
+    body: ts.map(t => { const r = rateFor(t.date); return [fmtDate(t.date), t.from, t.to, t.purpose, fmtKm(t.kmStart) + ' – ' + fmtKm(t.kmEnd), fmtKm(kmOf(t)), r == null ? '–' : n2(r, 4), 'EUR ' + n2(amountOf(t), 2)]; }),
+    foot: [['Totaal', '', '', '', '', fmtKm(totKm), '', 'EUR ' + n2(tot, 2)]],
+    styles: {fontSize:8, cellPadding:1.8, overflow:'linebreak', textColor:20},
+    headStyles: {fillColor:[29,79,160], textColor:255}, footStyles: {fillColor:[235,240,248], textColor:20, fontStyle:'bold'},
+    columnStyles: {0:{cellWidth:18}, 4:{cellWidth:26}, 5:{halign:'right', cellWidth:12}, 6:{halign:'right', cellWidth:14}, 7:{halign:'right', cellWidth:22}},
+    didParseCell: d => { if ((d.section === 'head' || d.section === 'foot') && d.column.index >= 5) d.cell.styles.halign = 'right'; },
+    margin: {left:14, right:14}
+  });
+  y = doc.lastAutoTable.finalY + 8;
+  if (y > 250) { doc.addPage(); y = 20; }
+  doc.setFontSize(8.5); doc.setTextColor(90);
+  doc.text(doc.splitTextToSize('Forfaitaire kilometervergoeding voor beroepsverplaatsingen met een privéwagen, berekend aan het officiële tarief dat gold op de datum van elke rit. Woon-werkverkeer is niet inbegrepen.', W - 28), 14, y);
+  y += 16; doc.setFontSize(10); doc.setTextColor(20);
+  doc.text('Opgemaakt op ' + fmtDate(today()), 14, y);
+  doc.text('Handtekening begunstigde', 14, y + 10); doc.line(14, y + 26, 90, y + 26);
+  doc.text('Voor akkoord, de vennootschap', W / 2 + 4, y + 10); doc.line(W / 2 + 4, y + 26, W - 14, y + 26);
+  saveFile(`onkostennota-km-${m}.pdf`, doc.output('blob'));
+});
+
+/* ---------- instellingen ---------- */
+const SF = {name:'#sName', company:'#sCompany', vat:'#sVat', plate:'#sPlate', car:'#sCar', home:'#sHome'};
+for (const k in SF) $(SF[k]).addEventListener('input', e => { const old = S.settings[k]; S.settings[k] = e.target.value; save(); if (k === 'home') { renderPlaces(); if (!editing && (!F.from.value || F.from.value === old)) F.from.value = e.target.value; } });
+function renderSettings(){
+  for (const k in SF) $(SF[k]).value = S.settings[k] || '';
+  const rs = S.rates.map((r, i) => ({...r, i})).sort((a, b) => b.from.localeCompare(a.from));
+  $('#rates').innerHTML = rs.length ? '<ul class="list">' + rs.map(r => `<li><div><div class="t num">${rateTxt(r.rate)} per km</div><div class="s">vanaf ${fmtDate(r.from)}</div></div><div class="r"><button class="mini danger" data-rdel="${r.i}">Wissen</button></div></li>`).join('') + '</ul>' : '<p class="empty">Nog geen tarief.</p>';
+  $('#rates').querySelectorAll('[data-rdel]').forEach(b => b.onclick = () => armed(b, () => { S.rates.splice(+b.dataset.rdel, 1); save(); renderSettings(); renderOdo(); }));
+  $('#places').innerHTML = S.places.length ? S.places.map((p, i) => `<li><div><div class="t">${esc(p.name)}</div><div class="s">${esc(p.addr)}</div></div><div class="r"><button class="mini danger" data-pdel="${i}">Wissen</button></div></li>`).join('') : '<li class="empty" style="display:block">Voeg klanten of adressen toe die je vaak bezoekt.</li>';
+  $('#places').querySelectorAll('[data-pdel]').forEach(b => b.onclick = () => armed(b, () => { S.places.splice(+b.dataset.pdel, 1); save(); renderSettings(); renderPlaces(); }));
+  $('#storeInfo').textContent = `${S.trips.length} ritten opgeslagen op dit toestel.`;
+}
+$('#addRate').addEventListener('click', () => {
+  const from = $('#newRateFrom').value, rate = Number($('#newRate').value.replace(',', '.'));
+  if (!from || !(rate > 0 && rate < 2)) return toast('Vul een datum en een bedrag per km in, bv. 0,4452.');
+  S.rates = S.rates.filter(r => r.from !== from); S.rates.push({from, rate}); save();
+  $('#newRate').value = ''; renderSettings(); renderOdo(); updateCalc(); toast('Tarief toegevoegd');
+});
+$('#addPlace').addEventListener('click', () => {
+  const name = $('#newPlace').value.trim(), addr = $('#newPlaceAddr').value.trim();
+  if (!name) return toast('Geef de bestemming een naam.');
+  S.places.push({name, addr}); save(); $('#newPlace').value = $('#newPlaceAddr').value = ''; renderSettings(); renderPlaces();
+});
+$('#backupBtn').addEventListener('click', () => saveFile(`ritten-backup-${today()}.json`, new Blob([JSON.stringify(S, null, 1)], {type:'application/json'})));
+$('#restoreBtn').addEventListener('click', () => $('#restoreFile').click());
+$('#restoreFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const j = JSON.parse(await f.text());
+    if (!j || !Array.isArray(j.trips)) throw 0;
+    const prev = S; S = Object.assign(defaults(), j); save(); renderAll();
+    toast(`Back-up teruggezet: ${S.trips.length} ritten`, 'Ongedaan maken', () => { S = prev; save(); renderAll(); });
+  } catch(err) { toast('Dit bestand is geen geldige back-up.'); }
+});
+
+function renderAll(){ renderOdo(); renderRecent(); renderPlaces(); if (!$('#v-overzicht').hidden) renderMonth(); if (!$('#v-instellingen').hidden) renderSettings(); }
+
+$('#newRateFrom').value = today();
+$('#month').value = today().slice(0, 7);
+renderAll(); resetForm();
+
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch(e) {}
+if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch(e) {} }
+}
+</script>
+</body>
+</html>
